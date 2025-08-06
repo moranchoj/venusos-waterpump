@@ -1,0 +1,45 @@
+# Node-RED specific
+.config.json
+.config.json.backup*
+flows_cred.json
+flows_cred.json.backup*
+.sessions.json
+
+# System and backup files
+*.log
+*.tmp
+*~
+.DS_Store
+Thumbs.db
+
+# Backup directories
+/backups/
+/data/pump-backups/
+
+# Development and testing
+/test/
+/tmp/
+.vscode/
+*.swp
+*.swo
+
+# Venus OS specific
+.venus-cache/
+/data/
+/opt/
+
+# Documentation build artifacts
+/docs/build/
+/docs/_build/
+
+# Node modules if any
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package files
+*.tar.gz
+*.zip
+*.deb
+*.rpm

@@ -1,0 +1,91 @@
+{
+    "system_name": "Water Pump Control System",
+    "version": "1.0.0",
+    "description": "Sistema automatitzat de control de bomba d'aigua entre dipòsits",
+    
+    "hardware": {
+        "raspberry_pi": "4B",
+        "venus_os_version": "3.64",
+        "relay_hat": "PiRelay v2",
+        "tank_monitor": "GX Tank 140",
+        "probe_type": "4-20mA level sensors"
+    },
+    
+    "gpio": {
+        "relay1_pin": 7,
+        "relay1_description": "Water pump control relay"
+    },
+    
+    "mqtt": {
+        "broker": "localhost",
+        "port": 1883,
+        "keepalive": 60,
+        "topics": {
+            "tank_a_level": "N/+/tank/0/Level",
+            "tank_b_level": "N/+/tank/1/Level"
+        }
+    },
+    
+    "control_logic": {
+        "tank_a": {
+            "name": "Dipòsit Inferior",
+            "description": "Lower tank (source)",
+            "min_level_start": 10,
+            "min_level_stop": 10,
+            "unit": "%"
+        },
+        "tank_b": {
+            "name": "Dipòsit Superior", 
+            "description": "Upper tank (destination)",
+            "max_level_start": 85,
+            "max_level_stop": 100,
+            "unit": "%"
+        },
+        "pump": {
+            "name": "Bomba d'Aigua",
+            "start_conditions": [
+                "Tank A level > 10%",
+                "Tank B level < 85%"
+            ],
+            "stop_conditions": [
+                "Tank A level < 10%",
+                "Tank B level >= 100%"
+            ]
+        }
+    },
+    
+    "dashboard": {
+        "title": "Water Pump System",
+        "groups": [
+            {
+                "name": "Monitoring",
+                "widgets": [
+                    "Tank A Level Gauge",
+                    "Tank B Level Gauge", 
+                    "Pump Status Text",
+                    "Pump Status LED"
+                ]
+            },
+            {
+                "name": "Control Manual",
+                "widgets": [
+                    "Manual Override Switch",
+                    "Manual Pump Control Switch"
+                ]
+            }
+        ]
+    },
+    
+    "safety": {
+        "dry_run_protection": true,
+        "manual_override": true,
+        "automatic_shutdown": true,
+        "priority": "Stop conditions override start conditions"
+    },
+    
+    "maintenance": {
+        "check_frequency": "weekly",
+        "calibration_frequency": "monthly",
+        "log_retention": "30 days"
+    }
+}

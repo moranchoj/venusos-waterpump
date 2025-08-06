@@ -6,14 +6,14 @@
     "hardware": {
         "raspberry_pi": "4B",
         "venus_os_version": "3.64",
-        "relay_hat": "PiRelay v2",
         "tank_monitor": "GX Tank 140",
         "probe_type": "4-20mA level sensors"
     },
     
-    "gpio": {
-        "relay1_pin": 7,
-        "relay1_description": "Water pump control relay"
+    "relay_control": {
+        "method": "Venus OS Native MQTT",
+        "topic": "W/+/relay/1/State",
+        "description": "Water pump control relay via Venus OS native functions"
     },
     
     "mqtt": {
@@ -22,7 +22,8 @@
         "keepalive": 60,
         "topics": {
             "tank_a_level": "N/+/tank/0/Level",
-            "tank_b_level": "N/+/tank/1/Level"
+            "tank_b_level": "N/+/tank/1/Level",
+            "relay_control": "W/+/relay/1/State"
         }
     },
     

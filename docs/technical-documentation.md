@@ -9,7 +9,6 @@ El sistema implementa un control automatitzat d'una bomba d'aigua que transferei
 
 #### Hardware
 - **Raspberry Pi 4B**: Controlador principal amb Venus OS
-- **HAT PiRelay v2**: Interface de control de relés
 - **GX Tank 140**: Monitor de nivells de dipòsits
 - **Sondes 4-20mA**: Sensors de nivell per cada dipòsit
 - **Bomba d'aigua**: Actuador principal connectat al relé 1
@@ -17,8 +16,8 @@ El sistema implementa un control automatitzat d'una bomba d'aigua que transferei
 #### Software
 - **Venus OS Large 3.64**: Sistema operatiu base
 - **Node-RED**: Plataforma d'automatització i dashboard
-- **RpiGpioSetup**: Paquet per control GPIO
 - **MQTT Broker**: Comunicació entre components
+- **Venus OS Native Functions**: Control de relés integrat
 
 ## Lògica de Control
 
@@ -42,7 +41,7 @@ THEN Stop_Pump()
 1. **MQTT Input Nodes**: Reben nivells dels dipòsits
 2. **Processing Functions**: Processen i emmagatzemen dades
 3. **Control Logic Function**: Implementa l'algoritme de control
-4. **GPIO Output Node**: Controla el relé de la bomba
+4. **MQTT Output Node**: Controla el relé de la bomba via Venus OS
 5. **Dashboard Nodes**: Visualització i control manual
 
 #### Funcions Clau
@@ -83,6 +82,9 @@ if (shouldStop) {
 - `N/+/tank/0/Level`: Nivell dipòsit inferior (A)
 - `N/+/tank/1/Level`: Nivell dipòsit superior (B)
 
+#### Sortida (Publicació)
+- `W/+/relay/1/State`: Control del relé 1 (bomba d'aigua)
+
 #### Configuració del Broker
 ```json
 {
@@ -104,23 +106,39 @@ if (shouldStop) {
 }
 ```
 
-## Control GPIO
+## Control de Relé Venus OS
 
 ### Configuració del Relé
 
-#### Pin Assignment
-- **GPIO Pin 7**: Control del relé 1 (bomba d'aigua)
-- **Logic**: HIGH = Relé tancat (bomba ON), LOW = Relé obert (bomba OFF)
+#### Venus OS Native MQTT Control
+- **Topic**: `W/+/relay/1/State`
+- **Valors**: 0 = relé obert (bomba OFF), 1 = relé tancat (bomba ON)
+- **QoS**: 2 (exactament una vegada)
 
-#### Node-RED GPIO Configuration
+#### Node-RED MQTT Configuration
 ```json
 {
-    "pin": "7",
-    "set": true,
-    "level": "0",
-    "out": "out"
+    "type": "mqtt out",
+    "topic": "W/+/relay/1/State",
+    "qos": "2",
+    "retain": "false",
+    "broker": "venus-broker"
 }
 ```
+
+### Avantatges del Venus OS Native Control
+
+#### Integració Completa
+- Control natiu integrat amb Venus OS
+- No requereix paquets externs
+- Compatibilitat garantida amb actualitzacions
+- Monitoreig integrat al sistema
+
+#### Fiabilitat i Seguretat
+- Control via D-Bus intern del sistema
+- Validació de seguretat per Venus OS
+- Logs integrats del sistema
+- Gestió d'errors automàtica
 
 ## Dashboard Web
 
@@ -242,9 +260,9 @@ flow.get('manual_override')  // Mode manual (boolean)
    - Revisar calibratge sensors
 
 2. **Relé no funciona**
-   - Verificar pin GPIO 7
-   - Comprovar HAT PiRelay v2
-   - Revisar RpiGpioSetup
+   - Verificar configuració del relé 1 a Venus OS
+   - Comprovar topic MQTT `W/+/relay/1/State`
+   - Revisar connexions físiques del relé
 
 3. **Dashboard no accessible**
    - Verificar servei Node-RED

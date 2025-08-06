@@ -4,7 +4,6 @@
 
 ### Hardware Necessari
 - **Raspberry Pi 4B** amb Venus OS Large 3.64
-- **HAT PiRelay v2** per control de relés
 - **GX Tank 140** per mesura de nivells
 - **2 Sondes de nivell 4-20mA** (una per cada dipòsit)
 - **Bomba d'aigua** connectada al relé 1
@@ -12,22 +11,15 @@
 ### Software Necessari
 - Venus OS Large 3.64
 - Node-RED (inclòs amb Venus OS)
-- Paquet RpiGpioSetup de GitHub
 
 ## Instal·lació Pas a Pas
 
 ### 1. Preparació de Venus OS
 
-#### Instal·lació del Paquet RpiGpioSetup
+#### Configuració del Sistema
 ```bash
-# Connectar per SSH a la Raspberry Pi
-ssh root@venus_ip
-
-# Descarregar i instal·lar RpiGpioSetup
-wget https://github.com/kwindrem/RpiGpioSetup/archive/main.zip
-unzip main.zip
-cd RpiGpioSetup-main
-./setup
+# Venus OS inclou totes les funcionalitats natives necessàries
+# No es requereix cap paquet extern per al control de relés
 ```
 
 #### Activació de Node-RED
@@ -38,10 +30,10 @@ cd RpiGpioSetup-main
 
 ### 2. Configuració del Hardware
 
-#### Connexió del HAT PiRelay v2
-1. Muntar el HAT sobre la Raspberry Pi seguint les instruccions del fabricant
-2. Verificar que el pin GPIO 7 està assignat al relé 1
-3. Connectar la bomba d'aigua al relé 1
+#### Connexió del Relé
+1. Connectar la bomba d'aigua al relé 1 integrat de Venus OS
+2. Verificar que el relé 1 està operatiu mitjançant la interfície de Venus OS
+3. Configurar el relé per al control automàtic via MQTT
 
 #### Configuració del GX Tank 140
 1. Connectar el GX Tank 140 a la Raspberry Pi via USB o CAN
@@ -66,7 +58,7 @@ cd RpiGpioSetup-main
 
 #### Verificació de la Configuració
 1. Verificar que els nodes MQTT es connecten correctament
-2. Comprovar que el node GPIO està configurat per al pin 7
+2. Comprovar que el control de relé funciona via MQTT
 3. Confirmar que el dashboard es mostra correctament
 
 ### 4. Configuració dels Topics MQTT
@@ -76,6 +68,11 @@ El sistema utilitza els següents topics MQTT de Venus OS:
 #### Topics d'Entrada (Lectures de Nivells)
 - `N/+/tank/0/Level` - Nivell del dipòsit inferior (A)
 - `N/+/tank/1/Level` - Nivell del dipòsit superior (B)
+
+#### Topics de Control (Relé)
+- `W/+/relay/1/State` - Control del relé 1 (bomba d'aigua)
+  - 0 = relé obert (bomba aturada)
+  - 1 = relé tancat (bomba en marxa)
 
 #### Configuració del Broker MQTT
 - **Host**: localhost (configurat automàticament)
@@ -124,9 +121,9 @@ El dashboard proporciona:
 - Revisar els topics MQTT
 
 #### El relé no funciona
-- Verificar la configuració del pin GPIO 7
-- Comprovar la instal·lació del RpiGpioSetup
-- Verificar les connexions del HAT PiRelay v2
+- Verificar la configuració del relé 1 a Venus OS
+- Comprovar el topic MQTT `W/+/relay/1/State`
+- Verificar les connexions físiques del relé
 
 #### Lectures incorrectes
 - Calibrar les sondes de nivell

@@ -51,7 +51,7 @@ test_flow_structure() {
     local required_nodes=(
         "mqtt in"
         "function"
-        "rpi-gpio out"
+        "mqtt out"
         "ui_gauge"
         "ui_text"
         "ui_led"
@@ -113,7 +113,7 @@ test_config_file() {
     local required_sections=(
         "system_name"
         "hardware"
-        "gpio"
+        "relay_control"
         "mqtt"
         "control_logic"
         "dashboard"

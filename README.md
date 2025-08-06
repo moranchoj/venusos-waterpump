@@ -19,7 +19,6 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 
 ### Hardware Necessari
 - **Raspberry Pi 4B** amb Venus OS Large 3.64
-- **HAT PiRelay v2** per control de relés
 - **GX Tank 140** per monitorització de nivells
 - **2 Sondes de nivell 4-20mA** (una per dipòsit)
 - **Bomba d'aigua** connectada al relé 1
@@ -27,7 +26,6 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 ### Software Necessari
 - Venus OS Large 3.64
 - Node-RED (inclòs amb Venus OS)
-- Paquet RpiGpioSetup
 - MQTT Broker (inclòs amb Venus OS)
 
 ## ⚙️ Lògica de Control
@@ -65,10 +63,8 @@ http://[IP_VENUS_OS]:1880/ui
 
 ### 1. Preparació del Sistema
 ```bash
-# Instal·lar RpiGpioSetup
-wget https://github.com/kwindrem/RpiGpioSetup/archive/main.zip
-unzip main.zip && cd RpiGpioSetup-main
-./setup
+# No es requereix cap paquet addicional
+# Venus OS inclou totes les funcionalitats natives necessàries
 ```
 
 ### 2. Activar Node-RED
@@ -87,10 +83,9 @@ cd venusos-waterpump
 ```
 
 ### 4. Configurar Hardware
-- Connectar HAT PiRelay v2 a la Raspberry Pi
+- Connectar bomba d'aigua al relé 1 del Venus OS
 - Configurar GX Tank 140 per als dipòsits
 - Connectar sondes 4-20mA als dipòsits
-- Connectar bomba al relé 1
 
 ## 📁 Estructura del Projecte
 
@@ -113,9 +108,11 @@ venusos-waterpump/
 ### Topics MQTT
 - **Dipòsit A**: `N/+/tank/0/Level`
 - **Dipòsit B**: `N/+/tank/1/Level`
+- **Relé 1**: `W/+/relay/1/State`
 
-### GPIO Configuration
-- **Relé 1**: Pin GPIO 7 (HAT PiRelay v2)
+### Relé Configuration
+- **Relé 1**: Control via MQTT topic `W/+/relay/1/State`
+- **Valors**: 0 = relé obert (bomba aturada), 1 = relé tancat (bomba en marxa)
 
 ### Personalització
 Editar `config/system-config.json` per modificar:
@@ -143,9 +140,12 @@ Editar `config/system-config.json` per modificar:
 ### Guies Disponibles
 - 📖 [**Guia d'Instal·lació**](docs/installation-guide.md): Instal·lació pas a pas
 - 🔧 [**Documentació Tècnica**](docs/technical-documentation.md): Detalls tècnics i API
+- ⚡ [**Control Natiu Venus OS**](docs/venus-os-native-control.md): Funcions natives del sistema
 
 ### Scripts Útils
 - 💾 [**Backup/Restore**](scripts/backup-restore.sh): Gestió de còpies de seguretat
+- 🧪 [**Test del Sistema**](scripts/test-system.sh): Validació completa del sistema
+- ⚡ [**Test de Relé**](scripts/test-relay-control.sh): Verificació del control natiu
 
 ## 🚨 Troubleshooting
 

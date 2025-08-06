@@ -18,7 +18,7 @@ El sistema implementa un control automatitzat d'una bomba d'aigua que transferei
 - **Venus OS Large 3.64**: Sistema operatiu base
 - **Node-RED**: Plataforma d'automatització i dashboard
 - **RpiGpioSetup**: Paquet per control GPIO
-- **MQTT Broker**: Comunicació entre components
+- **Venus OS D-Bus**: Interface directa per accés a dades de dispositius
 
 ## Lògica de Control
 
@@ -39,7 +39,7 @@ THEN Stop_Pump()
 ### Implementació en Node-RED
 
 #### Flow Principal
-1. **MQTT Input Nodes**: Reben nivells dels dipòsits
+1. **Venus OS Input Nodes**: Reben nivells dels dipòsits directament via D-Bus
 2. **Processing Functions**: Processen i emmagatzemen dades
 3. **Control Logic Function**: Implementa l'algoritme de control
 4. **GPIO Output Node**: Controla el relé de la bomba
@@ -49,11 +49,13 @@ THEN Stop_Pump()
 
 ##### Process Tank Level
 ```javascript
-var level = parseFloat(msg.payload);
+// Venus OS input provides the value directly in msg.payload
+var level = parseFloat(msg.payload.value || msg.payload);
 if (!isNaN(level)) {
     flow.set('tankA_level', level);
     msg.payload = level;
     msg.topic = "Tank A Level";
+    node.log("Tank A Level updated: " + level + "%");
     node.send([msg, {payload: "check_control"}]);
 }
 ```
@@ -70,37 +72,40 @@ var shouldStop = (tankA_level < 10) || (tankB_level >= 100);
 // Priority: Stop conditions override start conditions
 if (shouldStop) {
     newPumpState = false;
+    node.log("Pump stopped (Direct Venus OS) - Tank A: " + tankA_level + "%, Tank B: " + tankB_level + "%");
 } else if (shouldStart && !currentPumpState) {
     newPumpState = true;
+    node.log("Pump started (Direct Venus OS) - Tank A: " + tankA_level + "%, Tank B: " + tankB_level + "%");
 }
 ```
 
-## Interfície MQTT
+## Interfície Venus OS D-Bus
 
-### Topics de Venus OS
+### Serveis de Venus OS
 
-#### Entrada (Subscripció)
-- `N/+/tank/0/Level`: Nivell dipòsit inferior (A)
-- `N/+/tank/1/Level`: Nivell dipòsit superior (B)
+#### Accés Directe (Sense MQTT)
+- `com.victronenergy.tank.ttyUSB0/Level`: Nivell dipòsit inferior (A)
+- `com.victronenergy.tank.ttyUSB1/Level`: Nivell dipòsit superior (B)
 
-#### Configuració del Broker
+#### Configuració dels Nodes
 ```json
 {
-    "broker": "localhost",
-    "port": 1883,
-    "keepalive": 60,
-    "qos": 2
+    "service": "com.victronenergy.tank.ttyUSB0",
+    "path": "/Level",
+    "serviceObj": {
+        "service": "com.victronenergy.tank.ttyUSB0",
+        "name": "Tank A - Lower Tank"
+    }
 }
 ```
 
 ### Format de Missatges
 
-#### Nivells de Dipòsits
+#### Nivells de Dipòsits (Venus OS D-Bus)
 ```json
 {
-    "timestamp": "2023-12-01T12:00:00Z",
     "value": 75.5,
-    "unit": "%"
+    "timestamp": 1701432000000
 }
 ```
 
@@ -166,11 +171,13 @@ if (shouldStop) {
 
 #### Validació de Dades
 ```javascript
-var level = parseFloat(msg.payload);
+// Venus OS input provides the value directly in msg.payload
+var level = parseFloat(msg.payload.value || msg.payload);
 if (!isNaN(level)) {
     // Process valid data
+    node.log("Tank Level updated: " + level + "%");
 } else {
-    node.warn("Invalid level received: " + msg.payload);
+    node.warn("Invalid level received: " + JSON.stringify(msg.payload));
 }
 ```
 
@@ -182,14 +189,14 @@ if (!isNaN(level)) {
 ## Rendiment i Optimització
 
 ### Freqüència d'Actualització
-- **Lectures de nivell**: Temps real (segons disponibilitat MQTT)
+- **Lectures de nivell**: Temps real (segons disponibilitat D-Bus)
 - **Avaluació de control**: A cada canvi de nivell
 - **Actualització dashboard**: Instantània
 
 ### Recursos del Sistema
 - **CPU**: Baix impacte (<5% ús continu)
 - **Memòria**: ~50MB per Node-RED + flows
-- **Xarxa**: Tràfic MQTT mínim
+- **Xarxa**: Sense tràfic MQTT (només local D-Bus)
 
 ## API i Integració
 
@@ -205,7 +212,7 @@ flow.get('manual_override')  // Mode manual (boolean)
 ### Endpoints d'Integració
 - **Node-RED Admin**: `http://venus_ip:1880`
 - **Dashboard**: `http://venus_ip:1880/ui`
-- **MQTT Broker**: `mqtt://venus_ip:1883`
+- **Venus OS D-Bus**: Local interface (no network access needed)
 
 ## Backup i Recuperació
 
@@ -222,7 +229,7 @@ flow.get('manual_override')  // Mode manual (boolean)
 ## Monitorització i Manteniment
 
 ### Indicadors de Salut del Sistema
-- Connectivitat MQTT
+- Connectivitat Venus OS D-Bus
 - Lectures dels sensors
 - Estat del relé
 - Funcionament de Node-RED
@@ -238,7 +245,7 @@ flow.get('manual_override')  // Mode manual (boolean)
 
 1. **No es reben dades dels dipòsits**
    - Verificar connexions GX Tank 140
-   - Comprovar topics MQTT
+   - Comprovar serveis Venus OS D-Bus
    - Revisar calibratge sensors
 
 2. **Relé no funciona**

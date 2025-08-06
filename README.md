@@ -12,7 +12,7 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 
 - **Control automatitzat** basat en nivells dels dipòsits
 - **Interfície web** per monitorització i control manual
-- **Integració completa** amb Venus OS i MQTT
+- **Integració directa** amb Venus OS sense dependències MQTT
 - **Seguretat i fiabilitat** amb proteccions múltiples
 
 ## 🏗️ Components del Sistema
@@ -28,7 +28,6 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 - Venus OS Large 3.64
 - Node-RED (inclòs amb Venus OS)
 - Paquet RpiGpioSetup
-- MQTT Broker (inclòs amb Venus OS)
 
 ## ⚙️ Lògica de Control
 
@@ -110,9 +109,9 @@ venusos-waterpump/
 
 ## 🔧 Configuració Avançada
 
-### Topics MQTT
-- **Dipòsit A**: `N/+/tank/0/Level`
-- **Dipòsit B**: `N/+/tank/1/Level`
+### Topics Venus OS
+- **Dipòsit A**: `com.victronenergy.tank.ttyUSB0/Level`
+- **Dipòsit B**: `com.victronenergy.tank.ttyUSB1/Level`
 
 ### GPIO Configuration
 - **Relé 1**: Pin GPIO 7 (HAT PiRelay v2)
@@ -120,7 +119,7 @@ venusos-waterpump/
 ### Personalització
 Editar `config/system-config.json` per modificar:
 - Nivells de control (10%, 85%, 100%)
-- Configuració MQTT
+- Configuració de serveis Venus OS
 - Paràmetres de seguretat
 
 ## 🛡️ Seguretat i Fiabilitat
@@ -160,7 +159,7 @@ systemctl restart nodered
 #### No es reben dades dels dipòsits
 - Verificar connexions GX Tank 140
 - Comprovar calibratge de sondes
-- Revisar topics MQTT
+- Revisar serveis Venus OS
 
 #### Relé no funciona
 - Verificar instal·lació RpiGpioSetup

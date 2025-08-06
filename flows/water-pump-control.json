@@ -8,26 +8,42 @@
     },
     {
         "id": "tank-a-level",
-        "type": "mqtt in",
+        "type": "victron-input-custom",
         "z": "pump-control-tab",
+        "service": "com.victronenergy.tank.ttyUSB0",
+        "path": "/Level",
+        "serviceObj": {
+            "service": "com.victronenergy.tank.ttyUSB0",
+            "name": "Tank A - Lower Tank"
+        },
+        "pathObj": {
+            "path": "/Level",
+            "type": "float",
+            "name": "Level (%)"
+        },
+        "initial": "",
         "name": "Tank A Level",
-        "topic": "N/+/tank/0/Level",
-        "qos": "2",
-        "datatype": "auto",
-        "broker": "venus-broker",
         "x": 120,
         "y": 100,
         "wires": [["tank-a-level-process"]]
     },
     {
-        "id": "tank-b-level",
-        "type": "mqtt in",
+        "id": "tank-b-level", 
+        "type": "victron-input-custom",
         "z": "pump-control-tab",
+        "service": "com.victronenergy.tank.ttyUSB1",
+        "path": "/Level",
+        "serviceObj": {
+            "service": "com.victronenergy.tank.ttyUSB1",
+            "name": "Tank B - Upper Tank"
+        },
+        "pathObj": {
+            "path": "/Level",
+            "type": "float",
+            "name": "Level (%)"
+        },
+        "initial": "",
         "name": "Tank B Level",
-        "topic": "N/+/tank/1/Level",
-        "qos": "2",
-        "datatype": "auto",
-        "broker": "venus-broker",
         "x": 120,
         "y": 160,
         "wires": [["tank-b-level-process"]]
@@ -37,7 +53,7 @@
         "type": "function",
         "z": "pump-control-tab",
         "name": "Process Tank A Level",
-        "func": "// Process tank A level (lower tank)\nvar level = parseFloat(msg.payload);\nif (!isNaN(level)) {\n    // Store level in flow context\n    flow.set('tankA_level', level);\n    \n    // Prepare message for dashboard\n    msg.payload = level;\n    msg.topic = \"Tank A Level\";\n    \n    // Trigger control logic\n    node.send([msg, {payload: \"check_control\"}]);\n} else {\n    node.warn(\"Invalid Tank A level received: \" + msg.payload);\n}\nreturn null;",
+        "func": "// Process tank A level (lower tank) from Venus OS direct input\n// Venus OS input provides the value directly in msg.payload\nvar level = parseFloat(msg.payload.value || msg.payload);\nif (!isNaN(level)) {\n    // Store level in flow context\n    flow.set('tankA_level', level);\n    \n    // Prepare message for dashboard\n    msg.payload = level;\n    msg.topic = \"Tank A Level\";\n    \n    // Log the reading for debugging\n    node.log(\"Tank A Level updated: \" + level + \"%\");\n    \n    // Trigger control logic\n    node.send([msg, {payload: \"check_control\"}]);\n} else {\n    node.warn(\"Invalid Tank A level received: \" + JSON.stringify(msg.payload));\n}\nreturn null;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -52,7 +68,7 @@
         "type": "function",
         "z": "pump-control-tab",
         "name": "Process Tank B Level",
-        "func": "// Process tank B level (upper tank)\nvar level = parseFloat(msg.payload);\nif (!isNaN(level)) {\n    // Store level in flow context\n    flow.set('tankB_level', level);\n    \n    // Prepare message for dashboard\n    msg.payload = level;\n    msg.topic = \"Tank B Level\";\n    \n    // Trigger control logic\n    node.send([msg, {payload: \"check_control\"}]);\n} else {\n    node.warn(\"Invalid Tank B level received: \" + msg.payload);\n}\nreturn null;",
+        "func": "// Process tank B level (upper tank) from Venus OS direct input\n// Venus OS input provides the value directly in msg.payload\nvar level = parseFloat(msg.payload.value || msg.payload);\nif (!isNaN(level)) {\n    // Store level in flow context\n    flow.set('tankB_level', level);\n    \n    // Prepare message for dashboard\n    msg.payload = level;\n    msg.topic = \"Tank B Level\";\n    \n    // Log the reading for debugging\n    node.log(\"Tank B Level updated: \" + level + \"%\");\n    \n    // Trigger control logic\n    node.send([msg, {payload: \"check_control\"}]);\n} else {\n    node.warn(\"Invalid Tank B level received: \" + JSON.stringify(msg.payload));\n}\nreturn null;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -67,7 +83,7 @@
         "type": "function",
         "z": "pump-control-tab",
         "name": "Pump Control Logic",
-        "func": "// Get current tank levels from flow context\nvar tankA_level = flow.get('tankA_level') || 0;\nvar tankB_level = flow.get('tankB_level') || 0;\nvar currentPumpState = flow.get('pump_state') || false;\n\n// Control Logic:\n// Start pump (close relay) if:\n// - Tank A level > 10% AND Tank B level < 85%\n// Stop pump (open relay) if:\n// - Tank A level < 10% OR Tank B level >= 100%\n\nvar shouldStart = (tankA_level > 10) && (tankB_level < 85);\nvar shouldStop = (tankA_level < 10) || (tankB_level >= 100);\n\nvar newPumpState = currentPumpState;\n\n// Priority: Stop conditions override start conditions\nif (shouldStop) {\n    newPumpState = false;\n    node.log(\"Pump stopped - Tank A: \" + tankA_level + \"%, Tank B: \" + tankB_level + \"%\");\n} else if (shouldStart && !currentPumpState) {\n    newPumpState = true;\n    node.log(\"Pump started - Tank A: \" + tankA_level + \"%, Tank B: \" + tankB_level + \"%\");\n}\n\n// Only send command if state changed\nif (newPumpState !== currentPumpState) {\n    flow.set('pump_state', newPumpState);\n    \n    // Send relay control command\n    var relayMsg = {\n        payload: newPumpState ? 1 : 0,  // 1 = close relay (start pump), 0 = open relay (stop pump)\n        topic: \"relay1\"\n    };\n    \n    // Send status update\n    var statusMsg = {\n        payload: newPumpState ? \"Running\" : \"Stopped\",\n        topic: \"pump_status\"\n    };\n    \n    return [relayMsg, statusMsg];\n}\n\nreturn null;",
+        "func": "// Get current tank levels from flow context\nvar tankA_level = flow.get('tankA_level') || 0;\nvar tankB_level = flow.get('tankB_level') || 0;\nvar currentPumpState = flow.get('pump_state') || false;\n\n// Control Logic (Direct Venus OS Integration):\n// Start pump (close relay) if:\n// - Tank A level > 10% AND Tank B level < 85%\n// Stop pump (open relay) if:\n// - Tank A level < 10% OR Tank B level >= 100%\n\nvar shouldStart = (tankA_level > 10) && (tankB_level < 85);\nvar shouldStop = (tankA_level < 10) || (tankB_level >= 100);\n\nvar newPumpState = currentPumpState;\n\n// Priority: Stop conditions override start conditions\nif (shouldStop) {\n    newPumpState = false;\n    node.log(\"Pump stopped (Direct Venus OS) - Tank A: \" + tankA_level + \"%, Tank B: \" + tankB_level + \"%\");\n} else if (shouldStart && !currentPumpState) {\n    newPumpState = true;\n    node.log(\"Pump started (Direct Venus OS) - Tank A: \" + tankA_level + \"%, Tank B: \" + tankB_level + \"%\");\n}\n\n// Only send command if state changed\nif (newPumpState !== currentPumpState) {\n    flow.set('pump_state', newPumpState);\n    \n    // Send relay control command\n    var relayMsg = {\n        payload: newPumpState ? 1 : 0,  // 1 = close relay (start pump), 0 = open relay (stop pump)\n        topic: \"relay1\"\n    };\n    \n    // Send status update\n    var statusMsg = {\n        payload: newPumpState ? \"Running\" : \"Stopped\",\n        topic: \"pump_status\"\n    };\n    \n    return [relayMsg, statusMsg];\n}\n\nreturn null;",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
@@ -311,27 +327,7 @@
         "y": 460,
         "wires": [["relay-control"], ["status-splitter"]]
     },
-    {
-        "id": "venus-broker",
-        "type": "mqtt-broker",
-        "name": "Venus OS MQTT",
-        "broker": "localhost",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "compatmode": false,
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
-    },
+
     {
         "id": "dashboard-group",
         "type": "ui_group",

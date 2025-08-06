@@ -49,7 +49,7 @@ test_flow_structure() {
     
     # Check for required nodes
     local required_nodes=(
-        "mqtt in"
+        "victron-input-custom"
         "function"
         "rpi-gpio out"
         "ui_gauge"
@@ -74,18 +74,18 @@ test_flow_structure() {
         return 1
     fi
     
-    # Check for MQTT topics
-    if grep -q "N/+/tank/0/Level" "$FLOW_FILE"; then
-        log_info "Found Tank A MQTT topic ✓"
+    # Check for Venus OS D-Bus integration
+    if grep -q "com.victronenergy.tank" "$FLOW_FILE"; then
+        log_info "Found Venus OS tank service integration ✓"
     else
-        log_error "Missing Tank A MQTT topic"
+        log_error "Missing Venus OS tank service integration"
         return 1
     fi
     
-    if grep -q "N/+/tank/1/Level" "$FLOW_FILE"; then
-        log_info "Found Tank B MQTT topic ✓"
+    if grep -q "victron-input-custom" "$FLOW_FILE"; then
+        log_info "Found Venus OS input nodes ✓"
     else
-        log_error "Missing Tank B MQTT topic"
+        log_error "Missing Venus OS input nodes"
         return 1
     fi
     
@@ -114,7 +114,7 @@ test_config_file() {
         "system_name"
         "hardware"
         "gpio"
-        "mqtt"
+        "venus_os_integration"
         "control_logic"
         "dashboard"
     )

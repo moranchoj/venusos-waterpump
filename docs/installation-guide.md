@@ -65,22 +65,20 @@ cd RpiGpioSetup-main
 5. Fer clic a **Deploy** per activar el flow
 
 #### Verificació de la Configuració
-1. Verificar que els nodes MQTT es connecten correctament
+1. Verificar que els nodes Venus OS input es connecten correctament
 2. Comprovar que el node GPIO està configurat per al pin 7
 3. Confirmar que el dashboard es mostra correctament
 
-### 4. Configuració dels Topics MQTT
+### 4. Configuració de la Integració Venus OS
 
-El sistema utilitza els següents topics MQTT de Venus OS:
+El sistema accedeix directament a les dades dels dipòsits via D-Bus sense necessitat de configuració MQTT:
 
-#### Topics d'Entrada (Lectures de Nivells)
-- `N/+/tank/0/Level` - Nivell del dipòsit inferior (A)
-- `N/+/tank/1/Level` - Nivell del dipòsit superior (B)
+#### Serveis Venus OS Utilitzats
+- `com.victronenergy.tank.ttyUSB0` - Dipòsit inferior (A)
+- `com.victronenergy.tank.ttyUSB1` - Dipòsit superior (B)
 
-#### Configuració del Broker MQTT
-- **Host**: localhost (configurat automàticament)
-- **Port**: 1883
-- **Client ID**: Automàtic
+#### Path d'Accés
+- `/Level` - Nivell del dipòsit en percentatge
 
 ### 5. Configuració de la Lògica de Control
 
@@ -121,7 +119,7 @@ El dashboard proporciona:
 #### No es reben dades dels dipòsits
 - Verificar la configuració del GX Tank 140
 - Comprovar les connexions de les sondes
-- Revisar els topics MQTT
+- Revisar els serveis Venus OS D-Bus
 
 #### El relé no funciona
 - Verificar la configuració del pin GPIO 7
@@ -147,7 +145,7 @@ journalctl -u nodered -f
 #### Debug de Node-RED
 1. Activar els nodes de debug al flow
 2. Monitoritzar la pestanya de debug
-3. Verificar els missatges MQTT
+3. Verificar les dades dels serveis Venus OS
 
 ## Manteniment
 

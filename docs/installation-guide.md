@@ -40,7 +40,7 @@ cd RpiGpioSetup-main
 
 #### Connexió del HAT PiRelay v2
 1. Muntar el HAT sobre la Raspberry Pi seguint les instruccions del fabricant
-2. Verificar que el pin GPIO 7 està assignat al relé 1
+2. Verificar que el pin GPIO 19 està assignat al relé 1
 3. Connectar la bomba d'aigua al relé 1
 
 #### Configuració del GX Tank 140
@@ -66,7 +66,7 @@ cd RpiGpioSetup-main
 
 #### Verificació de la Configuració
 1. Verificar que els nodes MQTT es connecten correctament
-2. Comprovar que el node GPIO està configurat per al pin 7
+2. Comprovar que el node GPIO està configurat per al pin 19
 3. Confirmar que el dashboard es mostra correctament
 
 ### 4. Configuració dels Topics MQTT
@@ -124,7 +124,7 @@ El dashboard proporciona:
 - Revisar els topics MQTT
 
 #### El relé no funciona
-- Verificar la configuració del pin GPIO 7
+- Verificar la configuració del pin GPIO 19
 - Comprovar la instal·lació del RpiGpioSetup
 - Verificar les connexions del HAT PiRelay v2
 

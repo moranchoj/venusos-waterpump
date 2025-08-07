@@ -82,7 +82,7 @@
         "type": "rpi-gpio out",
         "z": "pump-control-tab",
         "name": "Relay 1 Control",
-        "pin": "7",
+        "pin": "19",
         "set": true,
         "level": "0",
         "freq": "",

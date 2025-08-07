@@ -12,7 +12,7 @@
     },
     
     "gpio": {
-        "relay1_pin": 7,
+        "relay1_pin": 19,
         "relay1_description": "Water pump control relay"
     },
     

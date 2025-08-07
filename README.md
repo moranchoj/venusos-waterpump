@@ -22,7 +22,7 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 - **HAT PiRelay v2** per control de relés
 - **GX Tank 140** per monitorització de nivells
 - **2 Sondes de nivell 4-20mA** (una per dipòsit)
-- **Bomba d'aigua** connectada al relé 1
+- **Bomba d'aigua** connectada al relé 2
 
 ### Software Necessari
 - Venus OS Large 3.64
@@ -33,12 +33,12 @@ Aquest sistema implementa el control automàtic d'una bomba que impulsa aigua de
 ## ⚙️ Lògica de Control
 
 ### Condicions d'Arrencada
-La bomba **arrenca** (relé 1 tancat) quan:
+La bomba **arrenca** (relé 2 tancat) quan:
 - 📊 Dipòsit inferior > **10%**
 - 📊 Dipòsit superior < **85%**
 
 ### Condicions de Parada
-La bomba **para** (relé 1 obert) quan:
+La bomba **para** (relé 2 obert) quan:
 - 📊 Dipòsit inferior < **10%** (protecció contra sec)
 - 📊 Dipòsit superior ≥ **100%** (protecció contra sobreompliment)
 
@@ -90,7 +90,7 @@ cd venusos-waterpump
 - Connectar HAT PiRelay v2 a la Raspberry Pi
 - Configurar GX Tank 140 per als dipòsits
 - Connectar sondes 4-20mA als dipòsits
-- Connectar bomba al relé 1
+- Connectar bomba al relé 2
 
 ## 📁 Estructura del Projecte
 
@@ -115,7 +115,7 @@ venusos-waterpump/
 - **Dipòsit B**: `N/+/tank/1/Level`
 
 ### GPIO Configuration
-- **Relé 1**: Pin GPIO 7 (HAT PiRelay v2)
+- **Relé 2**: Pin GPIO 13 (HAT PiRelay v2)
 
 ### Personalització
 Editar `config/system-config.json` per modificar:

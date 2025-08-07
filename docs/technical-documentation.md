@@ -12,7 +12,7 @@ El sistema implementa un control automatitzat d'una bomba d'aigua que transferei
 - **HAT PiRelay v2**: Interface de control de relés
 - **GX Tank 140**: Monitor de nivells de dipòsits
 - **Sondes 4-20mA**: Sensors de nivell per cada dipòsit
-- **Bomba d'aigua**: Actuador principal connectat al relé 1
+- **Bomba d'aigua**: Actuador principal connectat al relé 2
 
 #### Software
 - **Venus OS Large 3.64**: Sistema operatiu base
@@ -109,13 +109,13 @@ if (shouldStop) {
 ### Configuració del Relé
 
 #### Pin Assignment
-- **GPIO Pin 7**: Control del relé 1 (bomba d'aigua)
+- **GPIO Pin 13**: Control del relé 2 (bomba d'aigua)
 - **Logic**: HIGH = Relé tancat (bomba ON), LOW = Relé obert (bomba OFF)
 
 #### Node-RED GPIO Configuration
 ```json
 {
-    "pin": "7",
+    "pin": "13",
     "set": true,
     "level": "0",
     "out": "out"
@@ -242,7 +242,7 @@ flow.get('manual_override')  // Mode manual (boolean)
    - Revisar calibratge sensors
 
 2. **Relé no funciona**
-   - Verificar pin GPIO 7
+   - Verificar pin GPIO 13
    - Comprovar HAT PiRelay v2
    - Revisar RpiGpioSetup
 

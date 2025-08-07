@@ -12,8 +12,8 @@
     },
     
     "gpio": {
-        "relay1_pin": 7,
-        "relay1_description": "Water pump control relay"
+        "relay2_pin": 13,
+        "relay2_description": "Water pump control relay"
     },
     
     "mqtt": {

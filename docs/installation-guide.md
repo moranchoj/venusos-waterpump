@@ -7,7 +7,7 @@
 - **HAT PiRelay v2** per control de relés
 - **GX Tank 140** per mesura de nivells
 - **2 Sondes de nivell 4-20mA** (una per cada dipòsit)
-- **Bomba d'aigua** connectada al relé 1
+- **Bomba d'aigua** connectada al relé 2
 
 ### Software Necessari
 - Venus OS Large 3.64
@@ -40,8 +40,8 @@ cd RpiGpioSetup-main
 
 #### Connexió del HAT PiRelay v2
 1. Muntar el HAT sobre la Raspberry Pi seguint les instruccions del fabricant
-2. Verificar que el pin GPIO 7 està assignat al relé 1
-3. Connectar la bomba d'aigua al relé 1
+2. Verificar que el pin GPIO 13 està assignat al relé 2
+3. Connectar la bomba d'aigua al relé 2
 
 #### Configuració del GX Tank 140
 1. Connectar el GX Tank 140 a la Raspberry Pi via USB o CAN
@@ -66,7 +66,7 @@ cd RpiGpioSetup-main
 
 #### Verificació de la Configuració
 1. Verificar que els nodes MQTT es connecten correctament
-2. Comprovar que el node GPIO està configurat per al pin 7
+2. Comprovar que el node GPIO està configurat per al pin 13
 3. Confirmar que el dashboard es mostra correctament
 
 ### 4. Configuració dels Topics MQTT
@@ -124,7 +124,7 @@ El dashboard proporciona:
 - Revisar els topics MQTT
 
 #### El relé no funciona
-- Verificar la configuració del pin GPIO 7
+- Verificar la configuració del pin GPIO 13
 - Comprovar la instal·lació del RpiGpioSetup
 - Verificar les connexions del HAT PiRelay v2
 

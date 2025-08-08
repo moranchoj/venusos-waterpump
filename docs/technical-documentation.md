@@ -109,13 +109,13 @@ if (shouldStop) {
 ### Configuració del Relé
 
 #### Pin Assignment
-- **GPIO Pin 7**: Control del relé 1 (bomba d'aigua)
+- **GPIO Pin 19**: Control del relé 1 (bomba d'aigua)
 - **Logic**: HIGH = Relé tancat (bomba ON), LOW = Relé obert (bomba OFF)
 
 #### Node-RED GPIO Configuration
 ```json
 {
-    "pin": "7",
+    "pin": "19",
     "set": true,
     "level": "0",
     "out": "out"
@@ -242,7 +242,7 @@ flow.get('manual_override')  // Mode manual (boolean)
    - Revisar calibratge sensors
 
 2. **Relé no funciona**
-   - Verificar pin GPIO 7
+   - Verificar pin GPIO 19
    - Comprovar HAT PiRelay v2
    - Revisar RpiGpioSetup
 

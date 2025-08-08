@@ -115,7 +115,7 @@ venusos-waterpump/
 - **Dipòsit B**: `N/+/tank/1/Level`
 
 ### GPIO Configuration
-- **Relé 1**: Pin GPIO 7 (HAT PiRelay v2)
+- **Relé 1**: Pin GPIO 19 (HAT PiRelay v2)
 
 ### Personalització
 Editar `config/system-config.json` per modificar:
